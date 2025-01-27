@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import Todo from "./components/Todo";
+import { collection, onSnapshot, query } from "firebase/firestore";
+import { db } from "./service/firebase";
 const style = {
   bg: `h-screen w-screen p-4 bg-linear-to-t from-sky-500 to-indigo-500`,
   container: `bg-slate-100 max-w-[500px] w-full m-auto rounded-md shadow-xl p-4`,
@@ -12,14 +14,21 @@ const style = {
 };
 
 function App() {
-  const [todos, setTodos] = useState([
-    "Learn react",
-    "Learn firebase",
-    "Learn tailwind",
-  ]);
+  const [todos, setTodos] = useState([]);
 
   //create todo
   //read todo
+  useEffect(() => {
+    const q = query(collection(db, "todos"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let todosArr = [];
+      querySnapshot.forEach((doc) => {
+        todosArr.push({ ...doc.data(), id: doc.id });
+      });
+      setTodos(todosArr);
+    });
+    return () => unsubscribe();
+  }, []);
   //update todo
   //delete todo
 
