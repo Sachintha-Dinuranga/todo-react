@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import Todo from "./components/Todo";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "./service/firebase";
 const style = {
   bg: `h-screen w-screen p-4 bg-linear-to-t from-sky-500 to-indigo-500`,
@@ -30,6 +36,11 @@ function App() {
     return () => unsubscribe();
   }, []);
   //update todo
+  const toggleChecked = async (todo) => {
+    await updateDoc(doc(db, "todos", todo.id), {
+      completed: !todo.completed,
+    });
+  };
   //delete todo
 
   return (
@@ -44,7 +55,7 @@ function App() {
         </form>
         <ul>
           {todos.map((todo, index) => (
-            <Todo key={index} todo={todo} />
+            <Todo key={index} todo={todo} toggleChecked={toggleChecked} />
           ))}
         </ul>
         <p className={style.count}>You have 3 todos</p>
